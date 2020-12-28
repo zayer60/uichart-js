@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chart</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+        
+    </head>
+    <body>
+        <main>
+
+            <canvas id="myChart"></canvas>
+
+            <div>
+                <input type="text" id="product" placeholder="Product">
+                <input type="number" id="quantity" placeholder="quantity">
+            </div>
+            <button id ="add" onclick="addData(myChart)" >Add</button>
+            <button onclick="removeData(myChart)" >Remove</button>
+        </main>
+        <script>
+
+            
+            //document.addEventListener('DOMContentLoaded',function(){
+                        var ctx = document.getElementById('myChart').getContext('2d');
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [],
+                                datasets: [{
+                                    label: '# of Votes',
+                                    data: [],
+                                    backgroundColor: function(context) {
+                                                        var index = context.dataIndex;
+                                                        var value = context.dataset.data[index];
+                                                        return value < 0 ? 'red' :  
+                                                        index % 2 ? 'blue' : 'green';   
+                                                            
+                                                    }
+                                    ,
+                                    borderColor: function(context) {
+                                                        var index = context.dataIndex;
+                                                        var value = context.dataset.data[index];
+                                                        return value < 0 ? 'yellow' :  
+                                                        index % 2 ? 'black' : 'blue';
+                                                    },   
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                },
+                                title : {
+                                    display : true,
+                                    text:"Production",
+                                    position: 'top'
+                                }
+                            }
+                        });
+
+                        document.querySelector('#add').disabled=true;  
+                        
+                        
+                       document.querySelectorAll('input').forEach(input=>{
+                            input.onkeyup=()=>{
+                                if(document.querySelector('#product').value.length > 0 && document.querySelector('#quantity').value > 0){
+                                    document.querySelector('#add').disabled=false;
+                                }else{
+                                    document.querySelector('#add').disabled=true;
+                                }
+                                
+                            }
+                        }); 
+
+                        function addData(chart) {
+                            chart.data.labels.push(document.querySelector('#product').value);
+                            chart.data.datasets.forEach((dataset) => {
+                                dataset.data.push(document.querySelector('#quantity').value * 1);
+                            });
+                            chart.update();
+                            document.querySelectorAll('input').forEach(input=>{
+                                input.value=''; 
+                        })
+                            document.querySelector('#add').disabled=true;
+                    }
+
+                        function removeData(chart) {
+                            chart.data.labels.pop();
+                            chart.data.datasets.forEach((dataset) => {
+                                dataset.data.pop();
+                            });
+                            chart.update();
+                        }                                         
+                        
+            //})
+        </script>
+
+    </body>
+</html>

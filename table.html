@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Chart</title>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-        
+        <title>Chart</title> 
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>  
     </head>
     <body>
         <main>
 
-            <canvas id="myChart"></canvas>
-
-            <div>
+        
+            <form name="tablegen">
+                <canvas id="myChart"></canvas>
                 <input type="text" id="product" placeholder="Product">
                 <input type="number" id="quantity" placeholder="quantity">
-            </div>
-            <button id ="add" onclick="addData(myChart)" >Add</button>
-            <button onclick="removeData(myChart)" >Remove</button>
+                <button id="add" onclick='AddTableRows();addData(myChart);'>Add Data</button>
+                
+                <table id="tb1" class="table" border="1">
+                    <thead>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>RemoveAnyData</th>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </form>
         </main>
         <script>
-
-            
-           
-                        var ctx = document.getElementById('myChart').getContext('2d');
+             var ctx = document.getElementById('myChart').getContext('2d');
                         var myChart = new Chart(ctx, {
                             type: 'bar',
                             data: {
@@ -65,6 +71,7 @@
                         document.querySelector('#add').disabled=true;  
                         
                         
+                        
                        document.querySelectorAll('input').forEach(input=>{
                             input.onkeyup=()=>{
                                 if(document.querySelector('#product').value.length > 0 && document.querySelector('#quantity').value > 0){
@@ -76,28 +83,85 @@
                             }
                         }); 
 
+
+
+
                         function addData(chart) {
+                            //console.log(chart.data.datasets.data);
+                            console.log(chart.data.labels);
                             chart.data.labels.push(document.querySelector('#product').value);
+                            console.log(chart.data.labels);
                             chart.data.datasets.forEach((dataset) => {
-                                dataset.data.push(document.querySelector('#quantity').value * 1);
+                                dataset.data.push(parseInt(document.querySelector('#quantity').value));
+                                console.log(chart.data.datasets.data);
                             });
                             chart.update();
-                            document.querySelectorAll('input').forEach(input=>{
-                                input.value=''; 
-                        })
+                                document.querySelectorAll('input').forEach(input=>{
+                                    input.value=''; 
+                            })
                             document.querySelector('#add').disabled=true;
-                    }
+                        }
 
-                        function removeData(chart) {
+
+                        /*function removeData(chart) {
+                            console.log(chart.data.labels[0]);
                             chart.data.labels.pop();
                             chart.data.datasets.forEach((dataset) => {
                                 dataset.data.pop();
                             });
                             chart.update();
-                        }                                         
-                        
-           
-        </script>
+                        }*/
 
+
+
+                        
+
+            function removeData(chart){
+                var ds1={
+                            labels:chart.data.labels,
+                            data:chart.data.datasets.data
+                        }
+                let removalIndex = chart.data.datasets.indexOf(ds1); 
+                if(removalIndex >= 0) { 
+                    data.datasets.splice(removalIndex, 1);
+                }
+            chart.update();
+            }
+
+
+
+
+
+            var tbodyEl= document.querySelector('tbody')
+            var tableEl = document.querySelector('table')
+
+            function AddTableRows(){
+                var product=document.querySelector('#product').value;
+                var quantity=document.querySelector('#quantity').value;
+                tbodyEl.innerHTML += `
+                    <tr>
+                        <td>${product}</td>
+                        <td>${quantity}</td>
+                        <td><button class="deleteData" onclick="removeData(myChart)">Remove</button></td>
+                    </tr>
+                `;
+
+            }
+
+            
+            function delTableRows(e) {
+                if (!e.target.classList.contains('deleteData')){
+                    return;
+                }
+                const btn=e.target;
+                btn.closest("tr").remove();
+
+            }
+            
+            
+            
+            tableEl.addEventListener("click", delTableRows);
+            tableEl.addEventListener("click", removeData(myChart));
+        </script>
     </body>
 </html>
